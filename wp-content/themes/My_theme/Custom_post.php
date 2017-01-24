@@ -1,7 +1,8 @@
-<?php get_header(); 
+<?php /* Template Name: Custom Post - My Theme */ 
+get_header();
 $paged = ( get_query_var('paged') ) ? get_query_var('paged') : 1;
 $query_args = array(
-  'post_type' => 'post',
+  'post_type' => 'book',
   'posts_per_page' => 5,
   'paged' => $paged
 );
@@ -21,21 +22,5 @@ $the_query = new WP_Query( $query_args );
     <h1>Sorry...</h1>
     <p><?php _e('Sorry, no posts matched your criteria.'); ?></p>
 <?php endif;
-echo "Custom";
-$post_type=get_post_type('book');
-echo $post_type;
-/*$args = array(
-    'post_type' => 'custom_post_type',
-);
-$loop = new WP_Query($args);
-print_r($loop);
-while($loop->have_posts()): $loop->the_post();
-
-echo the_title();
-
-endwhile;
-wp_reset_query();
-get_footer(); */
-// Get the 'Profiles' post type
-
+get_footer();
 ?>
