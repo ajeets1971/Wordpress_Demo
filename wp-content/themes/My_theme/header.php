@@ -22,10 +22,19 @@
                 <a href="index.html"><img src="http://localhost/wordpress/wp-content/themes/My_theme/images/logo.gif" alt="Logo" /></a>
             </div>
             <ul>
-                <li class="first current"><a href="index.html">Home</a></li>
-                <li><a href="recipes.html">Recipes</a></li>
+                <!-- <li class="first current"><a href="http://localhost/wordpress/all-post/">All Post</a></li>
+                <li><a href="http://localhost/wordpress/custom-post/">Custom Post</a></li>
                 <li><a href="about.html">About us</a></li>
                 <li><a href="blog.html">Blog</a></li>
-                <li class="last"><a href="contact.html">Contact Us</a></li>
+                <li class="last"><a href="contact.html">Contact Us</a></li> -->
+            
+
+            <?php
+                $pages = get_pages(); 
+                foreach ( $pages as $page ) {
+                    if($page->post_title != "Sample Page" && $page->post_title != "Pages" )
+                        echo '<li><a  class="first current" href="'.get_page_link( $page->ID ).'">'.$page->post_title.'</a></li>';
+                }
+            ?>
             </ul>
         </div>
