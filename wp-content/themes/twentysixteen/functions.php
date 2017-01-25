@@ -419,3 +419,12 @@ function twentysixteen_widget_tag_cloud_args( $args ) {
 	return $args;
 }
 add_filter( 'widget_tag_cloud_args', 'twentysixteen_widget_tag_cloud_args' );
+
+function get_Pages_Shortcode(){
+	$pages = get_pages(); 
+    foreach ( $pages as $page ) {
+        echo '<br><li><a href="'. get_page_link( $page->ID ) .'">'.$page->post_title.'</a></li>';
+    }
+}
+
+add_shortcode( 'getPagesShortcode', 'get_Pages_Shortcode' );

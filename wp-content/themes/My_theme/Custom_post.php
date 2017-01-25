@@ -7,10 +7,20 @@ $query_args = array(
   'paged' => $paged
 );
 $the_query = new WP_Query( $query_args );
- if ( $the_query->have_posts() ) : while ( $the_query->have_posts() ) : $the_query->the_post(); // run the loop ?>
+ if ( $the_query->have_posts() ) : 
+  while ( $the_query->have_posts() ) : $the_query->the_post(); // run the loop ?>
     <h1><?php echo the_title(); ?></h1>
-      <?php the_excerpt(); ?>
-<?php endwhile; ?>
+      <?php the_excerpt(); 
+    $post_id = $post->ID;
+    $myvals = get_post_meta($post_id);
+    foreach($myvals as $key=>$val)
+    {
+
+      if($key=="Book_name" || $key=="Author_name" || $key=="Book_rating"):
+        echo $key . ' : ' . $val[0] . '<br/>';
+      endif;
+    }
+ endwhile; ?>
 
 <?php if ($the_query->max_num_pages > 1) { // check if the max number of pages is greater than 1  ?>
       <?php echo get_next_posts_link( 'Older Entries', $the_query->max_num_pages ); // display older posts link ?>
@@ -22,5 +32,6 @@ $the_query = new WP_Query( $query_args );
     <h1>Sorry...</h1>
     <p><?php _e('Sorry, no posts matched your criteria.'); ?></p>
 <?php endif;
+get_sidebar();
 get_footer();
 ?>
