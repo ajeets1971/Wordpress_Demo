@@ -607,3 +607,12 @@ function My_First_Custom_Post_type() {
   ));
 
 }
+
+function get_Pages_Shortcode(){
+	$pages = get_pages(); 
+    foreach ( $pages as $page ) {
+        echo '<br><li><a href="'. get_page_link( $page->ID ) .'">'.$page->post_title.'</a></li>';
+    }
+}
+
+add_shortcode( 'getPagesShortcode', 'get_Pages_Shortcode' );

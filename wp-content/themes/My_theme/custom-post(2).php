@@ -43,5 +43,7 @@
 	</div>
 	<?php endif; ?>
 	</div><!-- .navigation -->
-<?php	 get_footer();
+<?php	 
+get_sidebar();
+get_footer();
 ?>

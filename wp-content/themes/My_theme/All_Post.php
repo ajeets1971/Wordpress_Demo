@@ -4,7 +4,8 @@ $paged = ( get_query_var('paged') ) ? get_query_var('paged') : 1;
 $query_args = array(
   'post_type' => 'post',
   'posts_per_page' => 5,
-  'paged' => $paged
+  'paged' => $paged,
+  'shortcodes' => true
 );
 $the_query = new WP_Query( $query_args );
  if ( $the_query->have_posts() ) : while ( $the_query->have_posts() ) : $the_query->the_post(); // run the loop ?>
@@ -22,5 +23,8 @@ $the_query = new WP_Query( $query_args );
     <h1>Sorry...</h1>
     <p><?php _e('Sorry, no posts matched your criteria.'); ?></p>
 <?php endif;
+echo do_shortcode('[getPagesShortcode]');
+
+get_sidebar();
 get_footer();
 ?>

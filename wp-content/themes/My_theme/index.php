@@ -34,8 +34,8 @@ while($loop->have_posts()): $loop->the_post();
 echo the_title();
 
 endwhile;
-wp_reset_query();
-get_footer(); */
+wp_reset_query();*/
+get_footer(); 
 // Get the 'Profiles' post type
 
 ?>

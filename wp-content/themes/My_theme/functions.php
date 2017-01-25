@@ -41,16 +41,18 @@
 	add_action( 'admin_init', 'my_admin' );
 	
 	function my_admin() {
-	    add_meta_box( 'movie_review_meta_box',
+	    add_meta_box( 'book_review_meta_box',
 	        'Book Details',
-	        'display_movie_review_meta_box',
+	        'display_book_review_meta_box',
 	        'book', 'normal', 'high'
 	    );
 	}
-	function display_movie_review_meta_box( $movie_review ) {
+	function display_book_review_meta_box( $book ) {
     // Retrieve current name of the Director and Movie Rating based on review ID
-	    $movie_director = esc_html( get_post_meta( $movie_review->ID, 'movie_director', true ) );
-	    $movie_rating = intval( get_post_meta( $movie_review->ID, 'movie_rating', true ) );
+	    $Book_name = esc_html( get_post_meta( $book->ID, 'Book_name', true ) );
+	    $Author_name = esc_html( get_post_meta( $book->ID, 'Author_name', true ) );
+	    $Book_rating = intval( get_post_meta( $book->ID, 'Book_rating', true ) );
+	    wp_nonce_field( 'save_book_details', 'book_nonce' );
 	    ?>
 	    <table>
 	        <tr>
@@ -74,19 +76,87 @@
 	                </select>
 	            </td>
 	        </tr>
-	        <tr>
-	            <td style="width: 100%" colspan="2" align="center">
-	            <input type="submit" name="submit_book" id="submit_book" /></td>
-	        </tr>
 	    </table>
 	    <?php
 	}
-?>
-
-<style type="text/css">
-	#submit_book{
-		width: 200px;
-		height: 40px;
-		border-radius: 5px;
+	add_action( 'save_post', 'save_post_meta_book' );
+	function save_post_meta_book( $id )
+	{
+	    if( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) return;
+	     
+	    if( !isset( $_POST[book_nonce] ) || !wp_verify_nonce( $_POST['book_nonce'], 'save_book_details' ) ) return;
+	     
+	    if( !current_user_can( 'edit_post' ) ) return;
+	     
+	    $allowed = array(
+	        'p' => array()
+	    );
+	     
+	    if( isset( $_POST['Book_name'] ) )
+	        update_post_meta( $id, 'Book_name', wp_kses( $_POST['Book_name'], $allowed ) );
+	     
+	    if( isset( $_POST['Author_name'] ) )
+	        update_post_meta( $id, 'Author_name', esc_attr( strip_tags( $_POST['Author_name'] ) ) );
+	         
+	    if( isset( $_POST['Book_rating'] ) )
+	        update_post_meta( $id, 'Book_rating', esc_attr( strip_tags( $_POST['Book_rating'] ) ) );
+	     
 	}
-</style>
+
+	add_filter( 'the_content', 'cd_display_quote' );
+	function cd_display_quote( $content )
+	{   
+	    if( !is_single() ) return $content;
+	    global $post;	     
+	    $book = get_post_meta( $post->ID, 'Book_name', true );
+	    if( empty( $quote ) ) return $content;
+	    $author = get_post_meta( $post->ID, 'Author_name', true );
+	    $rating = get_post_meta( $post->ID, 'Book_rating', true );
+	    $out = '<blockquote>' . $book;
+	    if( !empty( $author ) )
+	    {
+	        $out .= '<p class="Author-name">-' . $author;
+	        if( !empty( $Rating ) )
+	            $out .= ' (' . $Rating . ')';
+	        $out .= '</p>';       
+	    }
+	    $out .= '</blockquote>';
+	    return $out . $content;
+	}
+
+	function arphabet_widgets_init() {
+
+		register_sidebar( array(
+			'name'          => 'Home right sidebar',
+			'id'            => 'home_right_1',
+			'before_widget' => '<div>',
+			'after_widget'  => '</div>',
+			'before_title'  => '<h2 class="rounded">',
+			'after_title'   => '</h2>',
+		) );
+
+	}
+	add_action( 'widgets_init', 'arphabet_widgets_init' );
+
+	function wpgyan_widgets_init() {
+
+	register_sidebar( array(
+		'name' => 'Header Sidebar',
+		'id' => 'header_sidebar',
+		'before_widget' => '<div id="wpgyan-widget">',
+		'after_widget' => '</div>',
+		'before_title' => '<h2 class="rounded">',
+		'after_title' => '</h2>',
+	) );
+	}
+	add_action( 'widgets_init', 'wpgyan_widgets_init' );
+
+	function get_Pages_Shortcode(){
+		$pages = get_pages(); 
+	    foreach ( $pages as $page ) {
+	        echo '<br><li><a href="'. get_page_link( $page->ID ) .'">'.$page->post_title.'</a></li>';
+	    }
+	}
+
+	add_shortcode( 'getPagesShortcode', 'get_Pages_Shortcode' );
+?>
