@@ -10,7 +10,7 @@ $query_args = array(
 $the_query = new WP_Query( $query_args );
  if ( $the_query->have_posts() ) : while ( $the_query->have_posts() ) : $the_query->the_post(); // run the loop ?>
     <h1><?php echo the_title(); ?></h1>
-      <?php the_excerpt(); ?>
+      <?php the_content(); ?>
 <?php endwhile; ?>
 
 <?php if ($the_query->max_num_pages > 1) { // check if the max number of pages is greater than 1  ?>
