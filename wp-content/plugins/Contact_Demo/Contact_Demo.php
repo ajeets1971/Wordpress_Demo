@@ -45,8 +45,8 @@
 
 	function register_custom_menu_page() {
     	add_menu_page('Contacts', 'Contacts', 'add_users', 'contacts', 'List_Contact'); 
-    	add_submenu_page('contacts', 'Contact List','Contact List', 'add_users', 'contacts', 'List_Contact');
-    	add_submenu_page( 'contacts', 'Add Contact', 'Add Contact', 'add_users','add_contact', 'add_contact');
+    	/*add_submenu_page('contacts', 'Contact List','Contact List', 'add_users', 'contacts', 'List_Contact');
+    	add_submenu_page( 'contacts', 'Add Contact', 'Add Contact', 'add_users','add_contact', 'add_contact');*/
 	}
 
 
@@ -80,8 +80,8 @@
 		</table>
 
 		<div>
-			<button value="Delete Record" id="delete">Delete Record</button>
-			<button value="Update Record" id="Update_getData">Update Record</button>
+			<!-- <button value="Delete Record" id="delete">Delete Record</button>
+			<button value="Update Record" id="Update_getData">Update Record</button> -->
 		</div>     
 		<script type="text/javascript">
            jQuery(document).ready(function(){
@@ -150,12 +150,6 @@
       		$all_data = $wpdb->query($ins_data);
 		}		
 	}
-
-	add_action('wp_ajax_delete_data', 'delete_data');
-
-	function delete_data()
-	{
-
-	}
+	add_shortcode('Add_Contact', 'add_contact');
 ?>
 
