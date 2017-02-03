@@ -10,10 +10,13 @@ wp-content/uploads/
 wp-content/wp-cache-config.php
 wp-content/plugins/hello.php
 
+
+
 /.htaccess
+wp-includes/images/crystal/license.txt
 /license.txt
 /readme.html
 /sitemap.xml
 /sitemap.xml.gz
-/wp-content/themes/mytheme_formated/readme.html
+/readme.html
 
