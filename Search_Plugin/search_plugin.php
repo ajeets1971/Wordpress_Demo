@@ -46,12 +46,8 @@ function remove_table(){
 
 add_action('admin_init','inc_func_pb');
 function inc_func_pb(){
-	/*wp_register_script('jquery_min_js_file',plugin_dir_url(__FILE__).'Css&Js/jquery.min.js');
+	wp_register_script('jquery_min_js_file',plugin_dir_url(__FILE__).'Css&Js/jquery.min.js');
    	wp_register_script('jquery_js_file',plugin_dir_url(__FILE__).'Css&Js/jquery-1.12.4.js');
-    wp_register_style('boostrap_css',"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css");
-    wp_register_style('jquery_ui_css',"//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css");
-    wp_register_script('jquery_ui_js',"https://code.jquery.com/ui/1.12.1/jquery-ui.js");
-    wp_register_script('boostrap_js',"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js");*/
 }
 
 add_action('admin_menu', 'register_custom_menu_page');
@@ -75,154 +71,85 @@ function import_csv()
 	{
 		$loc=$_FILES['Location_File']['name'];
 		$zip=$_FILES['Zipcode_File']['name'];
-		if (!file_exists( "/var/www/html/wordpress/wp-content/plugins/Search_Plugin/upload/" . $_FILES["Location_File"]["name"]))
+		if ($loc)
 		{
-			//echo "if loc";
 			move_uploaded_file($_FILES["Location_File"]["tmp_name"], "/var/www/html/wordpress/wp-content/plugins/Search_Plugin/upload/" . $loc);
 			chmod('/var/www/html/wordpress/wp-content/plugins/Search_Plugin/upload/' . $loc,0777);
 
 		}
-		if (!file_exists( "/var/www/html/wordpress/wp-content/plugins/Search_Plugin/upload/" . $_FILES["Zipcode_File"]["name"]))
+		if ($zip)
 		{
-			//echo "if zip";
 			move_uploaded_file($_FILES["Zipcode_File"]["tmp_name"], "/var/www/html/wordpress/wp-content/plugins/Search_Plugin/upload/" . $zip);
 			chmod('/var/www/html/wordpress/wp-content/plugins/Search_Plugin/upload/' . $zip,0777);
 		}
-				
-		if (($handle = fopen(plugin_dir_url(__FILE__)."upload/".$loc, "r")) !== FALSE) {
-			$r=0;
-		    while (($data = fgetcsv($handle, "\n")) !== FALSE) { 	
-		    	if($r==0)
-		    	{
-
+		if($loc!="")
+		{
+			if (($handle = fopen(plugin_dir_url(__FILE__)."upload/".$loc, "r")) !== FALSE) 
+			{
+				$r=0;
+				while (($data = fgetcsv($handle, "\n")) !== FALSE) 
+		    	{ 
+		    		if($r!=0)
+		    		{
+		    			$rset="";
+		    			$query="select * from wp_Location where franchise_id=".$data[0];
+						$rset=$wpdb->get_results($query);
+						if(count($rset)!=0)
+						{
+							$upq="";
+			    			if($rset[0]->franchise_name != $data[1])
+			    			{
+			    				$upq='update wp_Location set franchise_name="'.$data[1].'" where franchise_id='.$data[0];
+			    			}
+			    			if($rset[0]->phone != $data[2])
+			    			{
+			    				$upq='update wp_Location set phone="'.$data[2].'"where franchise_id='.$data[0];
+			    			}
+			    			if($rset[0]->website != $data[3])
+			    			{
+			    				$upq='update wp_Location set website="'.$data[3].'" where franchise_id='.$data[0];
+			    			}
+			    			if($rset[0]->email != $data[4])
+			    			{
+			    				$upq='update wp_Location set email="'.$data[4].'" where franchise_id='.$data[0];
+			    			}
+			    			if($rset[0]->county_codes != $data[5])
+			    			{
+			    				$upq='update wp_Location set county_codes="'.$data[5].'" where franchise_id='.$data[0];
+			    			}
+			    			$update = $wpdb->query($upq);
+						}
+						else
+						{
+					        $ins_data = 'INSERT INTO wp_Location VALUES ('.$data[0].',"'.$data[1].'","'.$data[2].'","'.$data[3].'","'.$data[4].'","'.$data[5].'")';
+		      				$all_data = $wpdb->query($ins_data);
+						}
+		    		}
+		    		$r++;
 		    	}
-		    	else
-		    	{
-			        /*print_r($data);
-			        echo "<br>";*/
-			        $ins_data = 'INSERT INTO wp_Location VALUES ('.$data[0].',"'.$data[1].'","'.$data[2].'","'.$data[3].'","'.$data[4].'","'.$data[5].'")';
-			        // echo $ins_data;
-      				$all_data = $wpdb->query($ins_data);
-		    	}
-		    	$r++;		        
 		    }
-		    fclose($handle);
+		}				
+		if($zip!="")
+		{
+			if (($handle = fopen(plugin_dir_url(__FILE__)."upload/".$zip, "r")) !== FALSE) 
+			{
+				$r=0;
+			    while (($data = fgetcsv($handle, "\n")) !== FALSE) { 	
+			    	if($r!=0)
+			    	{
+				        $ins_data = "INSERT INTO wp_Zipcode VALUES ('$data[0]','$data[1]','$data[2]','$data[3]','$data[4]')";
+	      				$all_data = $wpdb->query($ins_data);
+			    	}
+			    	$r++;		        
+			    }
+			    fclose($handle);
+			}		
 		}
-		if (($handle = fopen(plugin_dir_url(__FILE__)."upload/".$zip, "r")) !== FALSE) {
-			$r=0;
-		    while (($data = fgetcsv($handle, "\n")) !== FALSE) { 	
-		    	if($r==0)
-		    	{
-
-		    	}
-		    	else
-		    	{
-			        /*print_r($data);
-			        echo "<br>";*/
-			        $ins_data = "INSERT INTO wp_Zipcode VALUES ('$data[0]','$data[1]','$data[2]','$data[3]','$data[4]')";
-			        //echo $ins_data;
-      				$all_data = $wpdb->query($ins_data);
-		    	}
-		    	$r++;		        
-		    }
-		    fclose($handle);
-		}		
+		
 	}
 }
-function search_Zipcode()
-{
-	/*wp_enqueue_script('jquery_min_js_file');
-	wp_enqueue_script('jquery_js_file');
-	wp_enqueue_script("jquery_ui_js");
-	wp_enqueue_script("boostrap_js");
-	wp_enqueue_script("jquery_ui_js");
-	wp_enqueue_style("boostrap_css");
-	wp_enqueue_style("jquery_ui_css");*/
 
-?>
-
-
-
-	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-  	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-
-  	<style type="text/css">
-  	#recordModal table { display: block !important; overflow: scroll !important; }
-  	#Searched_Zip {
-  		width: 300px;
-  	}
-  	</style>
-
-
-  	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-  	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
-
-
-
-	<div>
-		<input type="text" name="Searched_Zip" placeholder="Enter Zipcode" id="Searched_Zip"/>
-		<button id="submit">Submit</button>
-	</div>
-	<div class="modal fade" id="recordModal" role="dialog">
-	    <div class="modal-dialog">
-		    <div class="modal-content">
-		        <div class="modal-header">
-		          <button type="button" class="close" data-dismiss="modal">&times;</button>
-		          <h4 class="modal_title">Location Data</h4>
-		        </div>
-		        <div class="modal-body modal_body" id="modal_table">
-
-		        <table border ="1">
-                      
-                </table>
-		        </div>
-		        <div class="modal-footer">
-		        </div>
-		    </div>
-		</div>
-	</div>
-	<script type="text/javascript">
-		jQuery(document).ready(function(){
-			jQuery("#submit").click(function(){
-			    var zip = jQuery("#Searched_Zip").val();
-			    alert(zip);
-		        jQuery.ajax({
-		              url: "<?php echo admin_url('admin-ajax.php') ?>",
-		              type: 'POST',
-		              data: {'action': 'get_result','zip':zip},
-		              error: function (ds, dd, ff) {
-		                 console.log(ff);
-		              }
-		          }).done(function (data) {
-		          	var tbhtml="<thead><td>Franchise Id</td><td>Franchise_Name</td><td>Phone</td><td>Website</td><td>Email</td><td>Country Codes</td></thead><tbody>";
-		          	console.log(data);
-		            /*var objs =jQuery.parseJSON(data);
-		            var trHTML="";
-		            jQuery.each(objs, function (name, value) {
-		              trHTML += "<td class='ref_name'> <a class='files'> " + value.proj_doc_name + "</a></td></tr>";  
-		            });*/
-		            if(data == 0)
-		            {
-		            	jQuery('.modal_body').html('No Record Found');
-		            	jQuery('#recordModal').modal('show');
-		            }
-		            else
-		            {
-		            	tbhtml += data;
-		            	jQuery('.modal_body table').html(tbhtml+'</tbody>');
-		            	jQuery('#recordModal').modal('show');
-		            } 
-		        });
-		
-			});
-		});
-	</script>
-<?php		
-}
-add_shortcode('search_Zipcode_Plugin', 'search_Zipcode');
-
+add_action("Searched_Zipcode_plugin","search_Zipcode");
 add_action('wp_ajax_get_result', 'get_result');
 add_action('wp_ajax_nopriv_get_result', 'get_result');
 
@@ -246,7 +173,90 @@ function get_result()
 	
     echo $tbhtml;
 }
+
+add_action('wp_head','hook_header');
+
+function hook_header()
+{
+	?>
+		<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+	  	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+	  	<style type="text/css">
+	  	#recordModal table { display: block !important; overflow: scroll !important; }
+	  	#Searched_Zip {
+	  		width: 300px;
+	  		display: inline;
+	  		margin-left: 250px;
+	  		margin-right: 50px;
+	  		margin-top: 22px;
+	  	}
+	  	#Searchplugin{
+	  		background-color: lightgrey;
+	  		height: 80px;
+	  	}
+	  	#submitzip{
+	  		margin-top: 22px;
+	  	}
+	  	</style>
+
+	  	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		<script type="text/javascript">
+		jQuery("document").ready(function(){
+			jQuery(".site-content-contain").prepend('<div id="Searchplugin"><input type="text" name="Searched_Zip" placeholder="Enter Zipcode" id="Searched_Zip"/><button id="submitzip">Submit</button></div>');
+			jQuery("#submitzip").click(function(){
+			    var zip = jQuery("#Searched_Zip").val();
+		        jQuery.ajax({
+		              url: "<?php echo admin_url('admin-ajax.php') ?>",
+		              type: 'POST',
+		              data: {'action': 'get_result','zip':zip},
+		              error: function (ds, dd, ff) {
+		                 console.log(ff);
+		              }
+		          }).done(function (data) {
+		          	var tbhtml="<thead><td>Franchise Id</td><td>Franchise_Name</td><td>Phone</td><td>Website</td><td>Email</td><td>Country Codes</td></thead><tbody>";
+		          	console.log(data);
+		            if(data == 0)
+		            {
+		            	jQuery('.modal_body').html('No Record Found');
+		            }
+		            else
+		            {
+		            	tbhtml += data;
+		            	jQuery('.modal_body table').html(tbhtml+'</tbody>');       	
+		            } 
+		            jQuery('#recordModal').modal('show');
+		        });
+				jQuery(document).keyup(function(ev){
+				    if(ev.keyCode == 27)
+				        jQuery("#recordModal").trigger("click");
+				});
+			});
+		});
+	</script>
+	<div class="modal fade" id="recordModal" role="dialog">
+    	<div class="modal-dialog">
+	    	<div class="modal-content">
+		        <div class="modal-header">
+<!-- 		          	<button type="button" class="close" data-dismiss="modal">&times;</button> -->
+		          	<h4 class="modal_title">Location Data</h4>
+		        </div>
+		        <div class="modal-body modal_body" id="modal_table">
+			        <table border ="1">     
+		            </table>
+		        </div>
+		        <div class="modal-footer">
+		        </div>
+	    	</div>
+		</div>
+	</div>
+	<?php
+}
+
 ?>
+
+
 
 
 
